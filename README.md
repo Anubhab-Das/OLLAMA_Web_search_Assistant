@@ -1,2 +1,4 @@
-# Web_search_Assistant
-Local Web Research Assistant using OLLAMA
+# OLLAMA Web Research Assistant 
+
+
+
