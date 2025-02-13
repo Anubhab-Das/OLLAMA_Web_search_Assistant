@@ -1,62 +1,41 @@
-# OLLAMA Web Research Assistant 
+# OLLAMA Web Research Assistant
 
-**PREREQUISITES**
+### **PREREQUISITES**
 
-<ins>Requirements.txt</ins>
+_Requirements.txt_
 
-ollama==0.3.3
-trafilatura==1.12.2
-beautifulsoup4==4.12.3
-colorama==0.4.6
+![Screenshot 2025-02-13 at 8 46 00 PM](https://github.com/user-attachments/assets/fc69c390-8dd8-4dc3-a548-f7c67d1400d8)
+
 
 
 This file contains the modules we need to import for our program. Use the below command:
 
-_Python3 -m pip install -r reuirements.txt_
+_Python3 -m pip install -r requirements.txt_
 
 
-<ins>Sys_msgs.py</ins>
+_Sys_msgs.py_
 
 This file will contain the explanations of the individual agent functions that OLLAMA will refer to, while deciding what the work of that agent function is. If you think over it, you might come up with better and more detailed explanations for the agents which will make your assistant perform better.
 
 
-assistant_msg={
-    'role':'system',
-    'content': (
-        'You are an AI assistant'
-    )
-}
 
-search_or_not_msg=(
-    'You are not an AI assistant. Only generate True or False based on the user input received on whether the answer to the query can be found in Ollama database or not.'
-)
 
-query_msg= (
-    'You are an AI web search query generator model. You must determine what the data is the assistant needs from scratch and generate the best DuckDuckGo query to find the data. Just type a query likely to retrieve the data we need'
-)
- 
-best_search_msg= (
-  'You are an AI model trained to select the best search result out of a list of 10 results. You must return a value from 0 to 9 from a list of zero indexed search result list'
-)
-
-contains_data_msg= (
-    'You are an AI model designed to analyze the data scraped and respond True or False, True meaning the data scraped indeed contains the reliable data and False meaning no it doesnt contain.'
-)
 
 This flowchart below depicts the 4 agent functions( diamonds) and 2 worker functions(squares) used in fetching user input, generating the query, parsing the query from the database and providing the best search result to the user.
 
-![image](https://github.com/user-attachments/assets/29328768-23a2-4909-9ce3-a8fcefe06f55)
+![image](https://github.com/user-attachments/assets/37c63f8a-3097-4edc-bc23-a9510055a84b)
 
 
-**GLOBAL VARIABLES**
+ 
+
+### **GLOBAL VARIABLES**
 
 assistant_convo=[sys_msgs.assistant_msg]
 
 - Global empty list for storing the responses from our assistant
 
 
-
-
+### **AGENT AND WORKER FUNCTION IN ORDER OF THEIR CALLING AND USAGE**
 
 **SEARCH_OR_NOT AGENT FUNCTION THAT RECEIVES USER INPUT AND DECIDES WHETHER TO SEARCH OR NOT**
 
@@ -65,6 +44,11 @@ assistant_convo=[sys_msgs.assistant_msg]
 The token is stored in 'content', and the complete message is stored in our empty list.
 
 
+**AGENT FUNCTION THAT CREATES A SEARCH QUERY TO SEARCH ON DUCKDUCKGO**
+
+-This function transforms the input received from the user and converts it into a query which will be used to search on DuckDuckGo. 
+
+Content will store the query which will be called by our worker function ai_search().
 
 **WORKER FUNCTION TO SEARCH THE GENERATED QUERY ON DUCKDUCKGO**
 
@@ -77,24 +61,9 @@ Then we are initializing an empty list called 'results' and running a loop to ge
 Then we will search for the link in class 'result__a' which starts with 'a', and then save it as a link. We will do the same for the snippet and then append the link and snippet to our 'results' list.
 
 
-
-**AGENT FUNCTION THAT CREATES A SEARCH QUERY TO SEARCH ON DUCKDUCKGO**
-
--This function transforms the input received from the user and converts it into a query which will be used to search on DuckDuckGo. 
-
-Content will store the query which will be called by our worker function ai_search().
-
-
 **AGENT FUNCTION TO SELECT THE BEST SEARCH RESULT FROM AMONG THE 10 SEARCH RESULTS THAT WE HAVE RECEIVED FROM OUR WORKER FUNCTION DUCKDUCKGOSEARCH()**
 
 -We will run a loop that allows the function 2 tries to get the best search result and stores it in 'content'. If the function is unable to get the best search result after 2 tries then the program continues on to the next function. 
-
-
-**AGENT FUNCTION TO EVALUATE IF DATA IS RELEVANT**
-
--This is our final agent function to determine whether the data we have received from our previous agent and worker functions is relevant to the query that our user has asked. 
-
-We check the relevance using OLLAMA model and save the response in 'content' in true/false format.
 
 
 **WORKER FUNCTION TO SCRAPE THE WEBPAGE USING TRAFILATURA**
@@ -103,6 +72,12 @@ We check the relevance using OLLAMA model and save the response in 'content' in 
 
 We run the extract function where we call the url of the link we had stored for our best_search_result.
 
+
+**AGENT FUNCTION TO EVALUATE IF DATA IS RELEVANT**
+
+-This is our final agent function to determine whether the data we have received from our previous agent and worker functions is relevant to the query that our user has asked. 
+
+We check the relevance using OLLAMA model and save the response in 'content' in true/false format.
 
 **AI WORKER FUNCTION TO HANDLE WEB SEARCH LOGIC, RETURNS CONTEXT FOR OUR PROMPT**
 
@@ -116,10 +91,9 @@ Then we are running a loop for all the results found and storing the best result
 
 We are running the scrape_webpage() function where we call trafilatura and saving the result in page_text variable. Once we show the best search result we are removing that result from our list using pop(). 
 
-
 **STREAM FUNCTION THAT STORES THE DATA AS IT IS RECEIVED FROM THE DIFFERENT FUNCTIONS**
 
--Defind assistant_convo list as a global variable so that all the functions can access it and append the response from OLLAMA model to the complete response string regarding what the assistant is doing.
+-Defined assistant_convo list as a global variable so that all the functions can access it and append the response from OLLAMA model to the complete response string regarding what the assistant is doing.
 
 
 **MAIN FUNCTION**
@@ -128,6 +102,8 @@ We are running the scrape_webpage() function where we call trafilatura and savin
 
 This prompt will be appended to the assistant_convo list and we will call the stream_assistant_response() to show the user the current state of the assistant.
 
+## **SAMPLE OUTPUT**
 
+![image](https://github.com/user-attachments/assets/4b25ee9b-5b75-4cea-a1cc-d19e1e798e91)
 
 
